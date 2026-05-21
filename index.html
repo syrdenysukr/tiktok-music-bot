@@ -12,11 +12,11 @@
         :root {
             --tiktok-red: #ff0050;
             --tiktok-cyan: #00f2fe;
-            --bg-dark: rgba(12, 12, 18, 0.85);
-            --bg-glass: rgba(25, 25, 35, 0.45);
-            --border-glass: rgba(255, 255, 255, 0.08);
+            --bg-dark: rgba(12, 12, 18, 0.35); /* Transparent background for clean overlay integration */
+            --bg-glass: rgba(25, 25, 35, 0.15); /* More transparent container items */
+            --border-glass: rgba(255, 255, 255, 0.05); /* Very subtle borders */
             --text-primary: #ffffff;
-            --text-secondary: #a0a0b8;
+            --text-secondary: #c0c0d8; /* Brightened up slightly for better contrast on transparent background */
             --glow-color: rgba(0, 242, 254, 0.2);
         }
 
@@ -677,11 +677,11 @@
     <!-- Fullscreen Autoplay Bypass -->
     <div id="click-overlay">
         <div class="overlay-card">
-            <div class="overlay-title">ТИКТОК МУЗЫКАЛЬНЫЙ БОТ</div>
-            <div class="overlay-desc">Браузеры блокируют автовоспроизведение звука. Выберите режим запуска виджета ниже:</div>
+            <div class="overlay-title">TIKTOK LIVE MUSIC BOT</div>
+            <div class="overlay-desc">Browsers block audio autoplay. Choose the widget mode below to start:</div>
             <div class="overlay-actions">
-                <button class="overlay-btn" id="btn-stream-mode">🎥 Режим Стрима (скрыть тест-панель)</button>
-                <button class="overlay-btn secondary" id="btn-test-mode">🛠 Режим Тестирования (с чат-панелью)</button>
+                <button class="overlay-btn" id="btn-stream-mode">🎥 Stream Mode (hide test panel)</button>
+                <button class="overlay-btn secondary" id="btn-test-mode">🛠 Test Mode (with test panel)</button>
             </div>
         </div>
     </div>
@@ -693,7 +693,7 @@
             <!-- Header -->
             <div class="widget-header">
                 <span class="pulse-indicator"></span>
-                <span class="widget-title">Музыка в эфире</span>
+                <span class="widget-title">Live Music</span>
             </div>
             
             <!-- Now Playing -->
@@ -708,8 +708,8 @@
                         </div>
                     </div>
                     <div class="track-meta">
-                        <div class="track-title" id="current-title">Ожидание заказов...</div>
-                        <div class="track-artist" id="current-artist">Закажи трек в чате!</div>
+                        <div class="track-title" id="current-title">Waiting for requests...</div>
+                        <div class="track-artist" id="current-artist">Order a track in chat!</div>
                         <div class="track-requester" id="current-requester">-</div>
                     </div>
                 </div>
@@ -739,11 +739,11 @@
             <!-- Queue Section -->
             <div class="queue-section">
                 <div class="queue-subheader">
-                    <span>ОЧЕРЕДЬ ТРЕКОВ</span>
+                    <span>TRACK QUEUE</span>
                     <span class="queue-count" id="queue-count">0</span>
                 </div>
                 <div class="queue-list" id="queue-list">
-                    <div class="empty-queue">Очередь пуста</div>
+                    <div class="empty-queue">Queue is empty</div>
                 </div>
             </div>
             
@@ -753,11 +753,11 @@
             <!-- Footer instructions -->
             <div class="widget-footer">
                 <div class="instruction-row order">
-                    <span>Заказать трек:</span>
-                    <span>!play [песня]</span>
+                    <span>Request track:</span>
+                    <span>!play [song]</span>
                 </div>
                 <div class="instruction-row skip">
-                    <span>Пропустить:</span>
+                    <span>Skip track:</span>
                     <span>!skip</span>
                 </div>
             </div>
@@ -766,12 +766,12 @@
 
         <!-- Test Control Panel (visible for local testing, easily croppable in OBS/TikTok Studio) -->
         <div class="test-panel hidden" id="test-panel">
-            <div class="test-panel-title">Панель тестирования (Эмуляция чата)</div>
+            <div class="test-panel-title">Test Control Panel (Chat Emulation)</div>
             <div class="test-input-group">
-                <input type="text" id="test-query" placeholder="Введите !play [трек], !skip или !gift [монет]..." autocomplete="off">
-                <button id="test-play-btn">Отправить</button>
+                <input type="text" id="test-query" placeholder="Enter !play [track], !skip or !gift [coins]..." autocomplete="off">
+                <button id="test-play-btn">Send</button>
             </div>
-            <button id="test-skip-btn" class="test-skip-btn">Кнопка-сокращение (!skip)</button>
+            <button id="test-skip-btn" class="test-skip-btn">Quick Skip Button (!skip)</button>
         </div>
     </div>
 
@@ -808,7 +808,7 @@
             } else {
                 testPanel.classList.add('hidden');
             }
-            audio.play().catch(e => console.log("Плеер разблокирован. Ждем треков."));
+            audio.play().catch(e => console.log("Player unlocked. Waiting for tracks."));
         }
 
         btnStreamMode.addEventListener('click', () => startWidget(false));
@@ -910,10 +910,10 @@
                 const skipSpan = document.querySelector('.instruction-row.skip span:last-child');
                 
                 if (orderSpan) {
-                    orderSpan.innerText = playPrice > 0 ? `!play [песня] (${playPrice} монета/ы)` : `!play [песня]`;
+                    orderSpan.innerText = playPrice > 0 ? `!play [song] (${playPrice} coin/s)` : `!play [song]`;
                 }
                 if (skipSpan) {
-                    skipSpan.innerText = skipPrice > 0 ? `!skip (${skipPrice} монета/ы)` : `!skip`;
+                    skipSpan.innerText = skipPrice > 0 ? `!skip (${skipPrice} coin/s)` : `!skip`;
                 }
             }
             
@@ -923,7 +923,7 @@
                 
                 const balance = (viewerBalances && viewerBalances[currentTrack.requestedBy]) ? viewerBalances[currentTrack.requestedBy].skips : 0;
                 const showBalance = settings && (settings.playPriceCoins > 0 || settings.skipPriceCoins > 0);
-                const balanceStr = showBalance ? ` (скипов: ${balance})` : '';
+                const balanceStr = showBalance ? ` (skips: ${balance})` : '';
                 document.getElementById('current-requester').innerText = `@${currentTrack.requestedBy}${balanceStr}`;
                 
                 if (currentTrack.artworkUrl) {
@@ -932,8 +932,8 @@
                     document.getElementById('track-cover').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a24'/><circle cx='50' cy='50' r='10' fill='%23333344'/></svg>";
                 }
             } else {
-                document.getElementById('current-title').innerText = "Ожидание заказов...";
-                document.getElementById('current-artist').innerText = "Закажи трек в чате!";
+                document.getElementById('current-title').innerText = "Waiting for requests...";
+                document.getElementById('current-artist').innerText = "Order a track in chat!";
                 document.getElementById('current-requester').innerText = "-";
                 document.getElementById('track-cover').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a24'/><circle cx='50' cy='50' r='10' fill='%23333344'/></svg>";
                 
@@ -952,7 +952,7 @@
             if (playlist.length === 0) {
                 const empty = document.createElement('div');
                 empty.className = 'empty-queue';
-                empty.innerText = 'Очередь пуста';
+                empty.innerText = 'Queue is empty';
                 queueList.appendChild(empty);
             } else {
                 // Show a maximum of 6 items visually
@@ -965,7 +965,7 @@
                     
                     const balance = (viewerBalances && viewerBalances[track.requestedBy]) ? viewerBalances[track.requestedBy].skips : 0;
                     const showBalance = settings && (settings.playPriceCoins > 0 || settings.skipPriceCoins > 0);
-                    const balanceStr = showBalance ? ` (баланс: ${balance})` : '';
+                    const balanceStr = showBalance ? ` (balance: ${balance})` : '';
 
                     item.innerHTML = `
                         <div class="queue-index">${index + 1}</div>
@@ -982,9 +982,9 @@
         }
 
         function playTrack(track) {
-            console.log("Воспроизведение MP3:", track.audioUrl);
+            console.log("Playing MP3:", track.audioUrl);
             audio.src = track.audioUrl;
-            audio.play().catch(e => console.log("Воспроизведение заблокировано. Нажмите на страницу."));
+            audio.play().catch(e => console.log("Playback blocked. Interaction required."));
         }
 
         // Track state listeners
@@ -1024,7 +1024,7 @@
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify(data));
             } else {
-                console.warn("WebSocket еще не готов. Попробуйте еще раз через секунду.");
+                console.warn("WebSocket is not ready yet. Please try again in a second.");
             }
         }
 
