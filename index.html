@@ -779,6 +779,12 @@
     <audio id="audio-player" autocomplete="off"></audio>
 
     <script>
+        // НАСТРОЙКА РЕЖИМА ПО УМОЛЧАНИЮ
+        const CLIENT_CONFIG = {
+            defaultMode: 'stream', // 'stream' (скрыть тест-панель для стрима) или 'test' (показать панель для тестов)
+            skipOverlay: true      // true - сразу запускать виджет без показа экрана выбора режима, false - показывать выбор
+        };
+
         const audio = document.getElementById('audio-player');
         const ws = new WebSocket('ws://localhost:3000');
         const widget = document.querySelector('.stream-widget');
@@ -807,6 +813,21 @@
 
         btnStreamMode.addEventListener('click', () => startWidget(false));
         btnTestMode.addEventListener('click', () => startWidget(true));
+
+        // Инициализация режима на основе URL параметров или конфигурации выше
+        const urlParams = new URLSearchParams(window.location.search);
+        const modeParam = urlParams.get('mode'); // 'stream' или 'test'
+        const skipOverlayParam = urlParams.get('skipOverlay'); // 'true' или 'false'
+
+        const finalMode = modeParam || CLIENT_CONFIG.defaultMode;
+        const finalSkipOverlay = skipOverlayParam !== null ? (skipOverlayParam === 'true') : CLIENT_CONFIG.skipOverlay;
+
+        if (finalSkipOverlay) {
+            // Небольшая задержка для надежной инициализации аудио в OBS/TikTok Live Studio
+            setTimeout(() => {
+                startWidget(finalMode === 'test');
+            }, 100);
+        }
 
         // Volume Management
         const savedVolume = localStorage.getItem('bot-player-volume');
